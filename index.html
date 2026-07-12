@@ -1,5 +1,5 @@
 <!DOCTYPE html><html lang="id">
-<head>
+<head> 
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#0f1020" />
@@ -30,7 +30,23 @@ body{
     linear-gradient(180deg, var(--bg1), var(--bg2));
   overflow-x:hidden;
 }
+.card-link{
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:18px;
+    padding:20px;
+}
 
+.card-link h3{
+    margin:0 0 10px;
+    font-size:20px;
+}
+
+.card-link p{
+    margin:0 0 18px;
+    color:var(--muted);
+    line-height:1.7;
+}
 .bg-blur{
   position:fixed;
   inset:auto;
@@ -294,6 +310,18 @@ button:active, .btn:active{ transform:translateY(0); opacity:.92; }
         <button class="primary" id="startBtn">Mulai Simulasi</button>
       </div>
     </div>
+        <div class="panel">
+  <div class="card-link">
+    <h3>📄 Pertanyaan Penting</h3>
+    <p>
+      Sebelum melanjutkan, ada beberapa pertanyaan yang perlu kamu jawab terlebih dahulu.
+    </p>
+
+    <button class="primary" onclick="window.location.href='https://raka579.github.io/pertanyaan-penting-/'">
+      Buka Pertanyaan
+    </button>
+  </div>
+        </div>
   </section>
 </main>
 
