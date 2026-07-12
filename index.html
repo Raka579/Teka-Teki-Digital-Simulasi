@@ -1,0 +1,623 @@
+<!DOCTYPE html><html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0f1020" />
+  <title>Mode Simulasi • Tantangan Teka-Teki Digital</title>
+  <style>
+    :root{
+      --bg1:#0b1020;
+      --bg2:#111832;
+      --card:rgba(255,255,255,.08);
+      --card2:rgba(255,255,255,.12);
+      --text:#f4f7ff;
+      --muted:rgba(244,247,255,.72);
+      --line:rgba(255,255,255,.14);
+      --accent:#8b5cf6;
+      --accent2:#22c55e;
+      --danger:#ef4444;
+      --shadow:0 18px 60px rgba(0,0,0,.35);
+      --radius:24px;
+    }* { box-sizing: border-box; }
+html, body { height: 100%; }
+body{
+  margin:0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(circle at top left, rgba(139,92,246,.28), transparent 30%),
+    radial-gradient(circle at top right, rgba(34,197,94,.16), transparent 26%),
+    linear-gradient(180deg, var(--bg1), var(--bg2));
+  overflow-x:hidden;
+}
+
+.bg-blur{
+  position:fixed;
+  inset:auto;
+  width:420px;
+  height:420px;
+  border-radius:50%;
+  filter:blur(80px);
+  opacity:.18;
+  pointer-events:none;
+  z-index:0;
+}
+.b1{ top:-120px; left:-120px; background:#8b5cf6; }
+.b2{ bottom:-160px; right:-100px; background:#22c55e; }
+
+.wrap{
+  position:relative;
+  z-index:1;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+}
+
+.screen{
+  width:min(920px, 100%);
+  display:none;
+  animation:fadeIn .45s ease both;
+}
+.screen.active{ display:block; }
+
+.card{
+  background:linear-gradient(180deg, var(--card), rgba(255,255,255,.05));
+  border:1px solid var(--line);
+  box-shadow:var(--shadow);
+  border-radius:var(--radius);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  overflow:hidden;
+}
+
+.hero{
+  padding:34px 24px 26px;
+  text-align:center;
+}
+
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 14px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  background:rgba(255,255,255,.06);
+  color:var(--muted);
+  font-size:13px;
+  letter-spacing:.3px;
+  margin-bottom:18px;
+}
+.dot{
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  background:var(--accent2);
+  box-shadow:0 0 0 6px rgba(34,197,94,.14);
+}
+
+h1{
+  margin:0;
+  font-size:clamp(28px, 4vw, 50px);
+  line-height:1.08;
+  letter-spacing:-.5px;
+}
+
+.lead{
+  margin:16px auto 0;
+  max-width:760px;
+  font-size:clamp(15px, 2.2vw, 18px);
+  color:var(--muted);
+  line-height:1.7;
+}
+
+.actions{
+  display:flex;
+  justify-content:center;
+  gap:14px;
+  flex-wrap:wrap;
+  margin-top:24px;
+}
+
+button, .btn{
+  appearance:none;
+  border:none;
+  cursor:pointer;
+  text-decoration:none;
+  color:var(--text);
+  font-weight:700;
+  letter-spacing:.2px;
+  padding:14px 20px;
+  border-radius:16px;
+  transition:transform .18s ease, box-shadow .18s ease, background .18s ease, opacity .18s ease;
+  box-shadow:0 10px 24px rgba(0,0,0,.18);
+}
+button:hover, .btn:hover{ transform:translateY(-2px); }
+button:active, .btn:active{ transform:translateY(0); opacity:.92; }
+
+.primary{
+  background:linear-gradient(135deg, #8b5cf6, #6366f1);
+}
+.secondary{
+  background:rgba(255,255,255,.08);
+  border:1px solid var(--line);
+}
+.success{
+  background:linear-gradient(135deg, #16a34a, #22c55e);
+}
+.danger{
+  background:linear-gradient(135deg, #dc2626, #ef4444);
+}
+
+.panel{
+  padding:22px;
+  border-top:1px solid var(--line);
+  display:grid;
+  gap:16px;
+}
+
+.question-box{
+  text-align:center;
+  padding:16px;
+  border:1px dashed rgba(255,255,255,.2);
+  border-radius:20px;
+  background:rgba(255,255,255,.05);
+}
+
+.question{
+  font-size:clamp(22px, 3vw, 32px);
+  font-weight:800;
+  margin:0 0 10px;
+}
+
+.small{
+  margin:0;
+  color:var(--muted);
+  line-height:1.6;
+  font-size:14px;
+}
+
+.hidden{ display:none !important; }
+
+.verify-box{
+  display:grid;
+  gap:14px;
+  padding:20px;
+  border-radius:20px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.12);
+}
+
+.status{
+  padding:12px 14px;
+  border-radius:14px;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.1);
+  color:var(--muted);
+  line-height:1.6;
+  min-height:48px;
+}
+.status.ok{ border-color:rgba(34,197,94,.35); color:#bdf7cb; }
+.status.err{ border-color:rgba(239,68,68,.35); color:#ffb6b6; }
+
+.story{
+  display:grid;
+  gap:20px;
+  grid-template-columns: 1.1fr .9fr;
+  padding:18px;
+}
+
+.story-text{
+  padding:24px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:14px;
+}
+
+.story-title{
+  margin:0;
+  font-size:clamp(15px, 3.2vw, 38px);
+  letter-spacing:-.4px;
+}
+
+.story-text p{
+  margin:0;
+  color:var(--muted);
+  line-height:1.8;
+  font-size:15px;
+}
+
+.story-figure{
+  padding:18px;
+}
+
+.image-box{
+    width:100%;
+    border-radius:22px;
+    overflow:hidden;
+    background:transparent;
+}
+
+.image-box img{
+    width:100%;
+    height:auto;
+    display:block;
+    object-fit:contain;
+}
+.placeholder{
+  text-align:center;
+  padding:18px;
+  color:var(--muted);
+  line-height:1.6;
+}
+
+.footer-note{
+  text-align:center;
+  margin-top:14px;
+  color:rgba(244,247,255,.5);
+  font-size:12px;
+}
+
+@keyframes fadeIn{
+  from{ opacity:0; transform:translateY(10px); }
+  to{ opacity:1; transform:translateY(0); }
+}
+
+@media (max-width: 760px){
+  .hero{ padding:28px 18px 22px; }
+  .panel{ padding:18px; }
+  .story{
+    grid-template-columns:1fr;
+    padding:14px;
+  }
+  .story-text{ padding:18px; }
+}
+
+  </style>
+</head>
+<body>
+  <div class="bg-blur b1"></div>
+  <div class="bg-blur b2"></div>  <div class="wrap">
+    <main class="screen active" id="screenIntro">
+      <section class="card">
+        <div class="hero">
+          <div class="badge"><span class="dot"></span><span>Mode Simulasi • Arsip Tantangan</span></div>
+          <h1>Mode Simulasi</h1>
+          <p class="lead">
+            Halaman ini dibuat sebagai versi latihan dari Tantangan Teka-Teki Digital.
+            Event resminya sudah selesai, tetapi kamu masih bisa membuka pengalaman yang mirip
+            untuk belajar, mencoba alur cerita, dan merasakan suasananya.
+          </p>      <div class="actions">
+        <button class="primary" id="startBtn">Mulai Simulasi</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<main class="screen" id="screenQuestion">
+  <section class="card">
+    <div class="hero">
+      <div class="badge"><span class="dot"></span><span>Langkah 1</span></div>
+      <h1 style="font-size: clamp(26px, 4vw, 44px);">Pertanyaan Awal</h1>
+      <p class="lead">Satu pilihan dulu sebelum lanjut ke cerita.</p>
+    </div>
+
+    <div class="panel">
+      <div class="question-box">
+        <p class="question">Gabut?</p>
+        <p class="small">Pilih satu jawaban untuk lanjut ke tahap berikutnya.</p>
+
+        <div class="actions" style="margin-top:18px;">
+          <button class="success" id="yesBtn">Iya</button>
+          <button class="danger" id="noBtn">Tidak</button>
+        </div>
+      </div>
+
+      <div class="status" id="questionStatus">
+        Menunggu pilihan...
+      </div>
+    </div>
+  </section>
+</main>
+
+<main class="screen" id="screenVerify">
+  <section class="card">
+    <div class="hero">
+      <div class="badge"><span class="dot"></span><span>Verifikasi Sidik Jari</span></div>
+      <h1 style="font-size: clamp(26px, 4vw, 44px);">Konfirmasi Identitas</h1>
+      <p class="lead">
+        Gunakan sidik jari, wajah, atau metode keamanan perangkat yang didukung browser.
+        Ini memakai WebAuthn, jadi prompt biometrik asli akan muncul pada perangkat yang kompatibel.
+      </p>
+    </div>
+
+    <div class="panel">
+      <div class="verify-box">
+        <div class="status" id="verifyStatus">
+          Klik tombol di bawah untuk mulai verifikasi.
+        </div>
+
+        <div class="actions">
+          <button class="primary" id="fingerBtn">Verifikasi Sidik Jari</button>
+          <button class="secondary" id="backBtn">Kembali</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<main class="screen" id="screenStory">
+  <section class="card">
+      <div class="panel">
+      <div class="status ok">
+        Berhasil masuk ke simulasi. Cerita dan gambar sudah tampil.
+      </div>
+    </div>
+        <div class="story-figure">
+        <div class="image-box">
+          <img src="foto.jpg"
+     alt="Gambar cerita Edo"
+     onerror="this.outerHTML='<div class=&quot;placeholder&quot;><strong>Gambar tidak ditemukan</strong><br>Tidur aja sono. orang gambarnya ga muncul 🗿</div>';">
+        </div>
+      </div>
+    <div class="story">
+      
+       
+       <div class="story-text">
+
+  <h2 class="story-title">
+    ━━━━━━━━━━━━━━━━━━<br>
+    EDO - SEORANG SISWA PROGRAMER<br>
+    ━━━━━━━━━━━━━━━━━━
+  </h2>
+
+  <p><em>"Setiap programmer meninggalkan jejak.<br>
+  Sebagian meninggalkannya di internet."</em></p>
+
+  <p>
+    Selamat datang di tantangan pertama.
+  </p>
+
+  <p>
+    Di hadapanmu adalah kamar milik seseorang bernama <strong>Edo</strong>.
+    Ia masih muda, senang bermain sepak bola, dan baru mulai mengenal dunia pemrograman.
+  </p>
+
+  <p>
+    Suatu hari, Edo membuat website pertamanya menggunakan
+    <strong>GitHub Pages</strong>.
+  </p>
+
+  <p>
+    Sayangnya...
+  </p>
+
+  <p>
+    Ia tidak pernah membagikan alamat websitenya secara langsung.
+  </p>
+
+  <p>
+    Yang tersisa hanyalah beberapa catatan dan benda-benda di kamarnya.
+  </p>
+
+  <p>
+    Tugasmu adalah menemukan alamat website tersebut.
+  </p>
+
+  <p><strong>━━━━━━━━━━━━━━━━━━<br>
+  CATATAN EDO<br>
+  ━━━━━━━━━━━━━━━━━━</strong></p>
+
+  <p>
+    📄 <strong>Catatan #1</strong><br><br>
+    Namaku hanya terdiri dari tiga huruf.<br>
+    Tidak perlu memakai nama belakang.
+  </p>
+
+  <p>
+    ──────────────────
+  </p>
+
+  <p>
+    📄 <strong>Catatan #2</strong><br><br>
+    Saat catatan ini dibuat,<br>
+    aku masih berusia <strong>15 tahun</strong>.
+  </p>
+
+  <p>
+    ──────────────────
+  </p>
+
+  <p>
+    📄 <strong>Catatan #3</strong><br><br>
+    Kalau sedang tidak bermain bola,<br>
+    biasanya aku sedang belajar membuat website.
+  </p>
+
+  <p>
+    ──────────────────
+  </p>
+
+  <p>
+    📄 <strong>Catatan #4</strong><br><br>
+    Website pertamaku dibuat menggunakan
+    <strong>GitHub Pages</strong>.
+  </p>
+
+  <p><strong>━━━━━━━━━━━━━━━━━━</strong></p>
+
+  <p>
+    Semua petunjuk yang kamu butuhkan sudah ada di hadapanmu.
+    Amati gambar dengan teliti, hubungkan setiap petunjuk,
+    lalu temukan alamat website Edo.
+  </p>
+
+  <p><strong>Selamat berburu!</strong></p>
+
+</div>
+      
+    </div>
+  </section>
+</main>
+
+  </div>  <template id="fallbackTemplate">
+    <div class="placeholder" id="fallbackImage">
+      <strong>Gambar tidak ditemukan</strong><br />
+      Simpan file gambar dengan nama <code>foto.jpg</code> di folder yang sama dengan HTML ini.
+    </div>
+  </template>  <div class="footer-note">Mode simulasi • tanpa timer • tanpa penguncian soal</div>  <script>
+    const screens = {
+      intro: document.getElementById('screenIntro'),
+      question: document.getElementById('screenQuestion'),
+      verify: document.getElementById('screenVerify'),
+      story: document.getElementById('screenStory')
+    };
+
+    const startBtn = document.getElementById('startBtn');
+    const yesBtn = document.getElementById('yesBtn');
+    const noBtn = document.getElementById('noBtn');
+    const backBtn = document.getElementById('backBtn');
+    const fingerBtn = document.getElementById('fingerBtn');
+
+    const questionStatus = document.getElementById('questionStatus');
+    const verifyStatus = document.getElementById('verifyStatus');
+
+    function showScreen(name) {
+      Object.values(screens).forEach(el => el.classList.remove('active'));
+      screens[name].classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function base64UrlToUint8Array(base64Url) {
+      const padding = '='.repeat((4 - base64Url.length % 4) % 4);
+      const base64 = (base64Url + padding).replace(/-/g, '+').replace(/_/g, '/');
+      const raw = atob(base64);
+      const arr = new Uint8Array(raw.length);
+      for (let i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i);
+      return arr;
+    }
+
+    function uint8ArrayToBase64Url(bytes) {
+      let binary = '';
+      bytes.forEach(b => binary += String.fromCharCode(b));
+      return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
+    }
+
+    function randomBuffer(len = 32) {
+      const buf = new Uint8Array(len);
+      crypto.getRandomValues(buf);
+      return buf;
+    }
+
+    function getStoredCredentialId() {
+      return localStorage.getItem('sim_cred_id');
+    }
+
+    function setStoredCredentialId(id) {
+      localStorage.setItem('sim_cred_id', id);
+    }
+
+    async function ensureCredential() {
+      const stored = getStoredCredentialId();
+      if (stored) return base64UrlToUint8Array(stored);
+
+      const challenge = randomBuffer(32);
+      const userId = randomBuffer(16);
+
+      const publicKey = {
+        challenge,
+        rp: { name: document.title },
+        user: {
+          id: userId,
+          name: "edo@example.local",
+          displayName: "Edo"
+        },
+        pubKeyCredParams: [
+          { type: "public-key", alg: -7 },
+          { type: "public-key", alg: -257 }
+        ],
+        authenticatorSelection: {
+          residentKey: "preferred",
+          userVerification: "required"
+        },
+        attestation: "none",
+        timeout: 60000
+      };
+
+      const cred = await navigator.credentials.create({ publicKey });
+      if (!cred) throw new Error("Pembuatan credential gagal.");
+
+      setStoredCredentialId(uint8ArrayToBase64Url(new Uint8Array(cred.rawId)));
+      return new Uint8Array(cred.rawId);
+    }
+
+    async function verifyFingerprint() {
+      if (!window.isSecureContext) {
+        throw new Error("WebAuthn butuh halaman HTTPS atau localhost.");
+      }
+      if (!window.PublicKeyCredential) {
+        throw new Error("Browser ini belum mendukung WebAuthn.");
+      }
+
+      const allowCredentialId = await ensureCredential();
+      const challenge = randomBuffer(32);
+
+      const publicKey = {
+        challenge,
+        allowCredentials: [{
+          type: "public-key",
+          id: allowCredentialId
+        }],
+        userVerification: "required",
+        timeout: 60000
+      };
+
+      const assertion = await navigator.credentials.get({ publicKey });
+      if (!assertion) throw new Error("Verifikasi dibatalkan.");
+      return true;
+    }
+
+    startBtn.addEventListener('click', () => {
+      showScreen('question');
+      questionStatus.className = 'status';
+      questionStatus.textContent = 'Menunggu pilihan...';
+    });
+
+    yesBtn.addEventListener('click', () => {
+      questionStatus.className = 'status ok';
+      questionStatus.textContent = 'Pilihan diterima. Lanjut ke verifikasi sidik jari.';
+      setTimeout(() => showScreen('verify'), 500);
+    });
+
+    noBtn.addEventListener('click', () => {
+      questionStatus.className = 'status err';
+      questionStatus.textContent = 'Oke, kamu belum mau lanjut. Silakan tekan Mulai Simulasi lagi kapan saja.';
+    });
+
+    backBtn.addEventListener('click', () => {
+      verifyStatus.className = 'status';
+      verifyStatus.textContent = 'Klik tombol di bawah untuk mulai verifikasi.';
+      showScreen('question');
+    });
+
+    fingerBtn.addEventListener('click', async () => {
+      try {
+        verifyStatus.className = 'status';
+        verifyStatus.textContent = 'Membuka prompt verifikasi...';
+
+        await verifyFingerprint();
+
+        verifyStatus.className = 'status ok';
+        verifyStatus.textContent = 'Verifikasi berhasil. Membuka cerita...';
+
+        setTimeout(() => showScreen('story'), 700);
+      } catch (err) {
+        verifyStatus.className = 'status err';
+        verifyStatus.textContent = err.message || 'Verifikasi gagal.';
+      }
+    });
+  </script></body>
+</html>
